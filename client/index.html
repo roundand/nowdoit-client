@@ -1,0 +1,67 @@
+<!doctype html>
+<title>Todo app</title>
+<script src="mithril.min.js"></script>
+<script>
+//app goes here
+var todo = {};
+
+// todo variable will at as our namespace
+// the todo.Todo class is a Todo item, and has the bovious two properties
+todo.Todo = function(data) {
+	this.description = m.prop(data.description);
+	this.done = m.prop(false);
+};
+
+// the todo.TodoList class is a generic array that will hold items
+todo.TodoList = Array;
+
+// time for a view-model to handle the view state
+todo.vm = (function() {
+	var vm = {};
+	vm.init = function() {
+
+		// our running list of todo items
+		vm.list = new todo.TodoList();
+
+		// somewhere to store the name of a new todo before it is added to the model
+		vm.description = m.prop('');
+
+		// add a todo item to the list, and clear description field for next use
+		vm.add = function() {
+			if(vm.description()) {
+				vm.list.push(new todo.Todo({description : vm.description()}));
+				vm.description('');
+			}
+		}
+	}
+	return vm;
+}());
+
+// a simple controller
+todo.controller = function(){
+	todo.vm.init()
+}
+
+// and a view
+todo.view = function() {
+	return m('html', [
+		m('body', [
+			m('input', {onchange: m.withAttr("value", todo.vm.description), value: todo.vm.description()}),
+			m('button', {onclick: todo.vm.add}, 'Add'),
+			m('table', [
+				todo.vm.list.map(function(task, index) {
+					return m('tr', [
+						m('td', [
+							m('input[type=checkbox]', {onclick: m.withAttr('checked', task.done), checked: task.done()})
+						]),
+						m('td', {style: {textDecoration: task.done() ? 'line-through' : 'none'}}, task.description())
+					]);
+				})
+			])
+		])
+	]);
+}
+
+// initialise the app
+m.module(document, {controller: todo.controller, view: todo.view});
+</script>
