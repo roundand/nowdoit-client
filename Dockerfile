@@ -33,6 +33,9 @@ ADD client /client
 # Append "daemon off;" to the beginning of the configuration
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf
 
+# install nodejs and npm
+RUN apt-get install -y nodejs-legacy npm git git-core
+
 # Expose ports
 EXPOSE 80
 EXPOSE 8080
